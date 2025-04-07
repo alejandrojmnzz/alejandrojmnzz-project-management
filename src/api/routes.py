@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
+from api.models import db, User, Project
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -20,3 +20,26 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+@api.route('/add-project', methods=['POST'])
+def add_project():
+    body = request.json()
+    project = Project()
+
+    title = body.get('title', None)
+    description = body.get('description', None)
+    project.in_progress = False
+    assigned_user = body.get('assigned_user', None)
+
+    if title is None or description is None:
+        return jsonify('Title and description are required')
+
+    if len(title) > 200 :
+        return jsonify("Title's max of characters is 200")
+
+    db.session.add()
+    try:
+        db.session.commit()
+        return jsonify('Created succesfully'), 201
+    except Exception as error:
+        return jsonify('An error has ocurred'), 500
