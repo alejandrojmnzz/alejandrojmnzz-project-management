@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Boolean, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import List
 
 db = SQLAlchemy()
 
@@ -8,16 +9,16 @@ class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+    salt: Mapped[str] = mapped_column(String(255), nullable=True)
 
-    project_id: Mapped[int] = mapped_column(ForeignKey('project.id'), nullable=True)
-    project: Mapped["Project"] = relationship(back_populates="user")
+    project: Mapped[List["Project"]] = relationship(back_populates="user")
 
 
     def serialize(self):
         return {
             "id": self.id,
-            "email": self.email
+            "email": self.email,
+            "projects": list(map(lambda item: item.serialize(), self.project))    
         }
 
 
@@ -27,13 +28,18 @@ class Project(db.Model):
     description: Mapped[str] = mapped_column(Text(), nullable=False)
     in_progress: Mapped[bool] = mapped_column(Boolean(False), nullable=False)
 
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    user: Mapped[List["User"]] = relationship(back_populates="project")
+
     
     def serialize(self):
         return {
             "id": self.id,
             "title": self.title,
             "description": self.description,
-            "in_progress": self.in_progress
+            "in_progress": self.in_progress,
+            "user_id": self.user_id,
+            # "users": self.user.serialize()
         }
 
 
