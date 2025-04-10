@@ -1,45 +1,33 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Boolean, Text, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, Boolean, Text, ForeignKey, Table, Column
+from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 from typing import List
 
-db = SQLAlchemy()
+class Base(DeclarativeBase):
+    pass
 
-class User(db.Model):
+
+association_table = Table(
+    "association_table",
+    Base.metadata,
+    Column("left_id", ForeignKey("left_table.id"), primary_key=True),
+    Column("right_id", ForeignKey("right_table.id"), primary_key=True),
+)
+
+
+class Parent(Base):
+    __tablename__ = "left_table"
+
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(nullable=False)
-    salt: Mapped[str] = mapped_column(String(255), nullable=True)
-
-    project: Mapped[List["Project"]] = relationship(back_populates="user")
+    children: Mapped[List[Child]] = relationship(
+        secondary=association_table, back_populates="parents"
+    )
 
 
-    def serialize(self):
-        return {
-            "id": self.id,
-            "email": self.email,
-            "projects": list(map(lambda item: item.serialize(), self.project))    
-        }
+class Child(Base):
+    __tablename__ = "right_table"
 
-
-class Project(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(String(200), nullable=False)
-    description: Mapped[str] = mapped_column(Text(), nullable=False)
-    in_progress: Mapped[bool] = mapped_column(Boolean(False), nullable=False)
-
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    user: Mapped[List["User"]] = relationship(back_populates="project")
-
-    
-    def serialize(self):
-        return {
-            "id": self.id,
-            "title": self.title,
-            "description": self.description,
-            "in_progress": self.in_progress,
-            "user_id": self.user_id,
-            # "users": self.user.serialize()
-        }
-
-
+    parents: Mapped[List[Parent]] = relationship(
+        secondary=association_table, back_populates="children"
+    )
