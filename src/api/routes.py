@@ -126,9 +126,8 @@ def get_user():
     print(user.serialize())
     return jsonify("done"), 200
 
-@api.route('/get-project', methods=['GET'])
+@api.route('/get-projects', methods=['GET'])
+@jwt_required()
 def get_project():
-    project = Project.query.filter_by(id = 1).first()
-    project_exist = Project.query.filter_by(projects = 1)
-    print(project_exist)
-    return jsonify("done"), 200
+    projects = Project.query.filter_by(user_id = int(get_jwt_identity()))
+    return jsonify(list(map(lambda project: project.serialize(), projects))), 200

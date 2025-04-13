@@ -30,8 +30,8 @@ class Project(db.Model):
     in_progress: Mapped[bool] = mapped_column(Boolean(False), nullable=False)
 
 
-    user_id: Mapped[int] = mapped_column(int(), ForeignKey('user.id'))
-    user: Mapped[User] = relationship(back_populates='project')
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    user: Mapped['User'] = relationship(back_populates='project')
 
     
     def serialize(self):
