@@ -106,16 +106,22 @@ def add_project():
     project.title = title
     project.description = description
 
-    project.user_id = int(get_jwt_identity())
-
     # currentUser.project_id = project.id
     # print(project.id)
 
 
     db.session.add(project)
     try:
-        db.session.commit() 
-        return jsonify('Created succesfully'), 201
+        db.session.commit()       
+    except Exception as error:
+        print(error.args)
+        return jsonify('An error has ocurred'), 500
+
+    user_id = int(get_jwt_identity())
+    project.user.append(User.query.filter_by(id = user_id).one_or_none())
+    try:
+        db.session.commit()
+        return jsonify("Project relationed"), 201
     except Exception as error:
         print(error.args)
         return jsonify('An error has ocurred'), 500
@@ -124,10 +130,13 @@ def add_project():
 def get_user():
     user = User.query.filter_by(email = "email2@gmail.com").one_or_none()
     print(user.serialize())
-    return jsonify("done"), 200
+    return jsonify(user.serialize()), 200
 
 @api.route('/get-projects', methods=['GET'])
 @jwt_required()
 def get_project():
-    projects = Project.query.filter_by(user_id = int(get_jwt_identity()))
+    # projects = Project.query.filter_by(user_id = int(get_jwt_identity()))
+    
+    projects = Project.query.all()
+
     return jsonify(list(map(lambda project: project.serialize(), projects))), 200
