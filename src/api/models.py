@@ -1,4 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy     
 from sqlalchemy import String, Boolean, Text, ForeignKey, Table, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 
@@ -36,7 +36,6 @@ class Project(db.Model):
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str] = mapped_column(Text(), nullable=False)
     in_progress: Mapped[bool] = mapped_column(Boolean(False), nullable=False)
-
     user: Mapped[list['User']] = relationship(secondary=user_project, back_populates='project')
 
     
@@ -46,7 +45,7 @@ class Project(db.Model):
             "title": self.title,
             "description": self.description,
             "in_progress": self.in_progress,
-            "users": [user.email for user in self.user]
+            "users": [user.id for user in self.user]
         }
 
 

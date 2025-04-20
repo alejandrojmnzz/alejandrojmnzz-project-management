@@ -127,16 +127,42 @@ def add_project():
         return jsonify('An error has ocurred'), 500
 
 @api.route('/get-user', methods=['GET'])
+@jwt_required()
 def get_user():
-    user = User.query.filter_by(email = "email2@gmail.com").one_or_none()
-    print(user.serialize())
+    user = User.query.filter_by(id = int(get_jwt_identity())).one_or_none()
     return jsonify(user.serialize()), 200
 
 @api.route('/get-projects', methods=['GET'])
 @jwt_required()
 def get_project():
-    # projects = Project.query.filter_by(user_id = int(get_jwt_identity()))
+    projects = Project.query.filter(Project.user.any(id = int(get_jwt_identity()))).all()
     
-    projects = Project.query.all()
-
     return jsonify(list(map(lambda project: project.serialize(), projects))), 200
+
+
+@api.route('/add-user/<int:user_id>/to-project/<int:project_id>', methods=['PUT'])
+def add_user_to_project(user_id, project_id):
+
+    project = Project.query.filter_by(id = project_id).one_or_none()
+
+    if project is None:
+        return jsonify('Project not found'), 404
+
+    user = User.query.filter_by(id = user_id).one_or_none()
+
+    if user is None:
+        return jsonify('User not found'), 404
+
+
+    if (user_id in project.serialize().get('users')):
+        return jsonify('User is already in project'), 409
+   
+
+    project.user.append(user)
+
+    try:
+        db.session.commit()
+        return jsonify('User added to the project'), 200
+    except Exception as error:
+        print(error.args)
+        return jsonify('An error has ocurred'), 500
