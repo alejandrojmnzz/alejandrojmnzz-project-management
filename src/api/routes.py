@@ -23,9 +23,11 @@ CORS(api)
 def add_new_user():
     try:
         body = request.json
-        name = body.get("name", None)
-        email = body.get("email",  None)
-        password = body.get("password", None)
+        user = body.get("user", None)
+        name = user.get("username", None)
+        email = user.get("email",  None)
+        password = user.get("password", None)
+        print(user)
 
         if name is None or email is None or password is None:
             return jsonify('Name, email and password keys are required'), 400
@@ -141,8 +143,8 @@ def get_project():
 
 
 @api.route('/add-user/<int:user_id>/to-project/<int:project_id>', methods=['PUT'])
+@jwt_required()
 def add_user_to_project(user_id, project_id):
-
     project = Project.query.filter_by(id = project_id).one_or_none()
 
     if project is None:
