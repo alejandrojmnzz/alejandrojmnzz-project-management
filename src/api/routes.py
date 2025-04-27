@@ -65,8 +65,9 @@ def add_new_user():
 @api.route('/log-in', methods=['POST'])
 def login():
     body = request.json
-    email = body.get('email', None)
-    password = body.get('password', None)
+    user = body.get("user", None)
+    email = user.get('email', None)
+    password = user.get('password', None)
 
     if email is None or password is None:
         return jsonify('Email and password keys are required'), 400

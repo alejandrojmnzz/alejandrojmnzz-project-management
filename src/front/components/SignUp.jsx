@@ -1,5 +1,6 @@
 import { useState } from "react"
 import useGlobalReducer from "../hooks/useGlobalReducer"
+import { handleSignUp } from "../reusable functions/handleSignUp"
 
 function SignUp() {
     const [user, setUser] = useState({})
@@ -12,12 +13,16 @@ function SignUp() {
         })
     }
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault()
-        dispatch({
-            type: "sign_up",
-            payload: { user: user }
-        })
+        const response = await handleSignUp(user)
+        console.log(response)
+        if (response.status === 201) {
+            alert("User created successfully")
+        } else {
+            alert("Error creating user")
+        }
+
     }
 
     return (

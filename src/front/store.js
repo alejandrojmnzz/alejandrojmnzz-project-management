@@ -1,4 +1,3 @@
-import axios from 'axios';
 
 export const initialStore = () => {
   return {
@@ -15,6 +14,7 @@ export const initialStore = () => {
         background: null,
       }
     ],
+    token: null,
     projects: []
   }
 }
@@ -47,7 +47,6 @@ export default function storeReducer(store, action = {}) {
               'Content-Type': 'application/json'
             }
           })
-          console.log(response.data)
           return 'done'
 
         } catch (error) {
@@ -57,6 +56,14 @@ export default function storeReducer(store, action = {}) {
       }
       signUp()
       return
+    case 'log_in':
+
+      return {
+        ...store,
+        token: action.payload.token
+      }
+
+
 
     case 'get_projects':
     // async function getProjects() {
