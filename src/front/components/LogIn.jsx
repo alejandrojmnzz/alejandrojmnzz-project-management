@@ -1,11 +1,31 @@
 import { useState } from "react"
 import useGlobalReducer from "../hooks/useGlobalReducer"
-import { handleLogIn } from "../reusable functions/handleLogIn.js"
 
 function LogIn() {
     const [user, setUser] = useState({})
     const { store, dispatch } = useGlobalReducer()
 
+    function handleLogIn() {
+        const response = new Promise((resolve, reject) => {
+            let data = axios.post(`http://localhost:3001/api/log-in`, {
+                user: user,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            resolve(data)
+        }).then((response) => {
+            dispatch({
+                type: "log_in",
+                payload: { token: response.data.token }
+            })
+            return
+        }).catch((error) => {
+            return error
+        })
+        return response
+    }
 
     function handleChange({ target }) {
         setUser({
@@ -15,15 +35,9 @@ function LogIn() {
         })
     }
 
-    async function handleSubmit(event) {
+    function handleSubmit(event) {
         event.preventDefault()
-        const response = await handleLogIn(user)
-        dispatch({
-            type: "log_in",
-            payload: { token: response.data.token }
-        })
-
-
+        handleLogIn()
     }
     return (
         <div className="login-container">

@@ -139,7 +139,6 @@ def get_user():
 @jwt_required()
 def get_project():
     projects = Project.query.filter(Project.user.any(id = int(get_jwt_identity()))).all()
-    
     return jsonify(list(map(lambda project: project.serialize(), projects))), 200
 
 

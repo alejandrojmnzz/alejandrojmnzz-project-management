@@ -1,10 +1,29 @@
 import { useState } from "react"
-import useGlobalReducer from "../hooks/useGlobalReducer"
-import { handleSignUp } from "../reusable functions/handleSignUp"
+import axios from "axios"
 
 function SignUp() {
     const [user, setUser] = useState({})
-    const { store, dispatch } = useGlobalReducer()
+
+    async function handleSignUp() {
+        try {
+            let response = await axios.post(`http://127.0.0.1:3001/api/sign-up`, {
+                user: user,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            if (response.status === 201) {
+                alert("User created successfully")
+            }
+
+            return response
+        } catch (error) {
+            alert("Error creating user")
+            console.error(error)
+            return error
+        }
+    }
 
     function handleChange({ target }) {
         setUser({
@@ -15,13 +34,7 @@ function SignUp() {
 
     async function handleSubmit(event) {
         event.preventDefault()
-        const response = await handleSignUp(user)
-        console.log(response)
-        if (response.status === 201) {
-            alert("User created successfully")
-        } else {
-            alert("Error creating user")
-        }
+        handleSignUp()
 
     }
 
