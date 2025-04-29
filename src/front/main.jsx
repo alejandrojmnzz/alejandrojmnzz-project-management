@@ -15,6 +15,7 @@ const Main = () => {
     );
     return (
         <>
+
             {/* Provide global state to all components */}
             <StoreProvider>
                 {/* Set up routing for the application */}

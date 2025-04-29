@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react"
 import useGlobalReducer from "../hooks/useGlobalReducer"
+import { useGetProjects } from "../hooks/useGetProjects"
 
 export function Project() {
     const { store, dispatch } = useGlobalReducer()
+    // const [project, setProject] = useState({})
+    const project = useGetProjects()
 
 
     useEffect(() => {
-        dispatch({
-            type: "get_projects"
-        })
+        async function fetchProject() {
+            return
+        }
+        console.log(fetchProject())
     }, [])
 
-    useEffect(() => {
-        console.log(store.projects)
-    }, [store.projects])
 
 
     const [projects, setProjects] = useState({})
