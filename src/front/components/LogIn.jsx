@@ -1,19 +1,21 @@
 import { useState } from "react"
 import useGlobalReducer from "../hooks/useGlobalReducer"
+import axios from "axios"
 
 function LogIn() {
     const [user, setUser] = useState({})
     const { store, dispatch } = useGlobalReducer()
 
     function handleLogIn() {
+
         const response = new Promise((resolve, reject) => {
-            let data = axios.post(`http://localhost:3001/api/log-in`, {
-                user: user,
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
+            let data = axios.post(`http://localhost:3001/api/log-in`,
+                user,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
             resolve(data)
         }).then((response) => {
             dispatch({
