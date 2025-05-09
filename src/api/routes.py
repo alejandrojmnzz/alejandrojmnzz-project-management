@@ -65,9 +65,8 @@ def add_new_user():
 @api.route('/log-in', methods=['POST'])
 def login():
     body = request.json
-    user = body.get("user", None)
-    email = user.get('email', None)
-    password = user.get('password', None)
+    email = body.get('email', None)
+    password = body.get('password', None)
 
     if email is None or password is None:
         return jsonify('Email and password keys are required'), 400
@@ -92,42 +91,40 @@ def login():
 @api.route('/add-project', methods=['POST'])
 @jwt_required()
 def add_project():
-    body = request.json
-    project = Project()
+    body = request.files
+    print(body)
+    return jsonify('basta')
+    # project = Project()
 
-    title = body.get('title', None)
-    description = body.get('description', None)
+    # title = body.get('title', None)
+    # description = body.get('description', None)
 
-    project.in_progress = False
+    # project.in_progress = False
 
-    if title is None or description is None:
-        return jsonify('Title and description are required')
+    # if title is None or description is None:
+    #     return jsonify('Title and description are required')
 
-    if len(title) > 200 :
-        return jsonify("Title's max of characters is 200")
+    # if len(title) > 200 :
+    #     return jsonify("Title's max of characters is 200")
 
-    project.title = title
-    project.description = description
+    # project.title = title
+    # project.description = description
 
-    # currentUser.project_id = project.id
-    # print(project.id)
+    # db.session.add(project)
+    # try:
+    #     db.session.commit()       
+    # except Exception as error:
+    #     print(error.args)
+    #     return jsonify('An error has ocurred'), 500
 
-
-    db.session.add(project)
-    try:
-        db.session.commit()       
-    except Exception as error:
-        print(error.args)
-        return jsonify('An error has ocurred'), 500
-
-    user_id = int(get_jwt_identity())
-    project.user.append(User.query.filter_by(id = user_id).one_or_none())
-    try:
-        db.session.commit()
-        return jsonify("Project relationed"), 201
-    except Exception as error:
-        print(error.args)
-        return jsonify('An error has ocurred'), 500
+    # user_id = int(get_jwt_identity())
+    # project.user.append(User.query.filter_by(id = user_id).one_or_none())
+    # try:
+    #     db.session.commit()
+    #     return jsonify("Project relationed"), 201
+    # except Exception as error:
+    #     print(error.args)
+    #     return jsonify('An error has ocurred'), 500
 
 @api.route('/get-user', methods=['GET'])
 @jwt_required()
@@ -139,6 +136,7 @@ def get_user():
 @jwt_required()
 def get_project():
     projects = Project.query.filter(Project.user.any(id = int(get_jwt_identity()))).all()
+    print('hola')
     return jsonify(list(map(lambda project: project.serialize(), projects))), 200
 
 

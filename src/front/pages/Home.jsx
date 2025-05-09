@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import rigoImageUrl from "../assets/img/rigo-baby.jpg";
+import '../index.css'
 import { CreateProject } from "../components/CreateProject";
 
 export const Home = () => {
